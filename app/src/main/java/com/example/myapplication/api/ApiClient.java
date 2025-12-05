@@ -19,7 +19,7 @@ public class ApiClient {
         if (retrofit == null) {
 
             // IMPORTANT: Replace with your computer's IP address
-            String BASE_URL = "http://192.168.1.4:5000/";
+            String BASE_URL = "http://127.0.0.1:5000/";
 
             // Add logging to see API requests/responses in Logcat
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message ->
