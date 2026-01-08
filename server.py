@@ -1,52 +1,83 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import base64
 import numpy as np
 import cv2
+import uuid
+import os
 from ultralytics import YOLO
-
-# Load YOLOv8 model (COCO pretrained)
-model = YOLO("yolov8s.pt")
+from database import init_db, insert_detection, fetch_history
 
 app = Flask(__name__)
 
+# Directory where uploaded frames are saved
+UPLOAD_DIR = "static/uploads/"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+# Load YOLOv8 model once (fast)
+model = YOLO("yolov8l.pt")
+
+# Initialize SQLite DB
+init_db()
+
+
+# ---- PERSON DETECTION ENDPOINT ----
 @app.route("/detect", methods=["POST"])
 def detect():
     data = request.get_json()
-    print("DEBUG Incoming JSON keys:", data.keys())
 
     if not data or "image" not in data:
         return jsonify({"error": "no image"}), 400
 
     try:
-        # Decode Base64 Image
+        # Decode Base64 image
         img_bytes = base64.b64decode(data["image"])
         nparr = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-        if img is None:
-            return jsonify({"error": "invalid image"}), 400
+        # Run model
+        results = model(img, conf=0.3)[0]
 
-        # Run YOLO Detection
-        results = model(img, conf=0.3)[0]   # ✅ confidence threshold added
+        # Count persons (class id=0)
+        count = sum(1 for box in results.boxes if int(box.cls.item()) == 0)
 
-        count = 0
+        # Save image to disk
+        filename = f"{uuid.uuid4().hex}.jpg"
+        cv2.imwrite(os.path.join(UPLOAD_DIR, filename), img)
 
-        if results.boxes is not None:
-            for box in results.boxes:
-                cls_id = int(box.cls.item())      # ✅ Proper YOLOv8 tensor conversion
-                conf = float(box.conf.item())    # ✅ Confidence check
+        # Save record to database
+        insert_detection(count, filename)
 
-                # COCO person class = 0
-                if cls_id == 0 and conf > 0.35:
-                    count += 1
-
-        print("✅ People detected:", count)
         return jsonify({"count": count})
 
     except Exception as e:
-        print("❌ SERVER ERROR:", e)
+        print("SERVER ERROR:", e)
         return jsonify({"error": "server error"}), 500
 
 
+# ---- HISTORY ENDPOINT ----
+@app.route("/history", methods=["GET"])
+def history():
+    rows = fetch_history()
+    output = []
+
+    for ts, count, filename in rows:
+        output.append({
+            "timestamp": ts,
+            "count": count,
+            "filename": filename,
+            "url": f"/static/uploads/{filename}"
+        })
+
+    return jsonify({"history": output})
+
+
+# ---- SERVE IMAGE FILES FOR ANDROID UI ----
+@app.route("/static/uploads/<filename>")
+def serve_image(filename):
+    return send_from_directory(UPLOAD_DIR, filename)
+
+
+# ---- RUN SERVER ----
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
