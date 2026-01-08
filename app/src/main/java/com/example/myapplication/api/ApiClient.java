@@ -15,19 +15,17 @@ public class ApiClient {
     private static final String TAG = "ApiClient";
     private static Retrofit retrofit = null;
 
+    // 🔹 BASE_URL moved here so other classes can access it
+    public static final String BASE_URL = "http://192.168.1.6:5000/";
+
     public static Retrofit getClient() {
         if (retrofit == null) {
 
-            // IMPORTANT: Replace with your computer's IP address
-            String BASE_URL = "http://127.0.0.1:5000/";
-
-            // Add logging to see API requests/responses in Logcat
             HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(message ->
                     Log.d(TAG, message)
             );
             loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-            // Build OkHttpClient with logging and headers
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(loggingInterceptor)
                     .addInterceptor(chain -> {

@@ -2,9 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.myapplication">
 
+    <!-- Permissions -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Camera feature -->
     <uses-feature
         android:name="android.hardware.camera.any"
         android:required="true" />
@@ -18,6 +20,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CrowdMonitor">
 
+        <!-- History screen -->
+        <activity
+            android:name=".HistoryActivity"
+            android:exported="false" />
+
+        <!-- Main screen -->
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -1,35 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout 
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#000">
 
     <androidx.camera.view.PreviewView
         android:id="@+id/previewView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:keepScreenOn="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/crowdText"
-        app:implementationMode="compatible" />
+        app:implementationMode="compatible"/>
 
-    <TextView
-        android:id="@+id/crowdText"
+    <!-- TOP STATUS PILL -->
+<Button
+    android:id="@+id/btnSend"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Send Image"
+    android:textStyle="bold"
+    android:padding="12dp"
+    android:layout_marginBottom="40dp"
+    android:layout_marginHorizontal="20dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"/>
+<Button
+    android:id="@+id/btnHistory"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="History"
+    android:layout_margin="20dp"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <LinearLayout
+        android:id="@+id/statusBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="WAITING…"
-        android:textSize="24sp"
-        android:textColor="#FFFFFF"
-        android:background="#80000000"
-        android:padding="16dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        app:layout_constraintTop_toBottomOf="@id/previewView"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:orientation="horizontal"
+        android:background="@drawable/status_pill"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:layout_margin="18dp"
+        android:elevation="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <TextView
+            android:id="@+id/statusLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="WAITING"
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="18sp"/>
+
+        <TextView
+            android:id="@+id/countLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" (0)"
+            android:textColor="#CFCFCF"
+            android:textSize="18sp"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
